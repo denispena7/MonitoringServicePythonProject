@@ -12,21 +12,21 @@ logger = get_logger('MonitorApp')
 navegadores = {"chrome.exe", "msedge.exe", "firefox.exe", "opera.exe"}
 
 def procesar_ventanas(ventanas_activas, ventanas_existentes):
-    # logger.info("🔍 Entrando a procesar_ventanas()")
+    # logger.info("Entrando a procesar_ventanas()")
     nuevas_activas = {}
 
     ventanas_actuales_dict = obtener_ventanas_visibles()
-    # logger.info(f"🔍 Ventanas actuales detectadas: {ventanas_actuales_dict.keys()}")
+    # logger.info(f"Ventanas actuales detectadas: {ventanas_actuales_dict.keys()}")
     ventanas_actuales = set(ventanas_actuales_dict.keys())
 
     nuevas = ventanas_actuales - ventanas_activas.keys() - ventanas_existentes
-    # logger.info(f"🔍 Nuevas ventanas detectadas: {nuevas}")
+    # logger.info(f"Nuevas ventanas detectadas: {nuevas}")
     for clave in nuevas:
         mostrar, proceso = ventanas_actuales_dict[clave]
         ventanas_activas[clave] = (datetime.datetime.now(), mostrar, proceso)
 
     cerradas = list(ventanas_activas.keys() - ventanas_actuales)
-    # logger.info(f"🔍 Ventanas cerradas detectadas: {cerradas}")
+    # logger.info(f"Ventanas cerradas detectadas: {cerradas}")
     for clave in cerradas:
         fecha = datetime.datetime.now()
         hora_inicio, nombre, proceso = ventanas_activas.pop(clave)
@@ -41,7 +41,7 @@ def procesar_ventanas(ventanas_activas, ventanas_existentes):
             es_navegador = proceso in navegadores
             categoria = clasificar_aplicacion(proceso) if proceso else "Otros"
 
-            logger.info(f"🔍 Preparando inserción de sesión: {nombre_app}, Duración: {duracion}s")
+            logger.info(f"Preparando inserción de sesión: {nombre_app}, Duración: {duracion}s")
 
             cat = devolver_id_categoria(categoria)
 
@@ -52,7 +52,7 @@ def procesar_ventanas(ventanas_activas, ventanas_existentes):
             )
 
             if not verficar_aplicacion(app.nombreAplicacion):
-                logger.info(f"🆕 Registrando nueva aplicación: {app.nombreAplicacion}")
+                logger.info(f"Registrando nueva aplicación: {app.nombreAplicacion}")
                 registrar_app(app)
 
             id_aplicacion = devolver_id_aplicacion(app.nombreAplicacion)
@@ -67,7 +67,7 @@ def procesar_ventanas(ventanas_activas, ventanas_existentes):
 
             registrar_sesion_app(sesion_app)
 
-            logger.info(f'🆕 Título: "{nombre_app}" | '
+            logger.info(f'Título: "{nombre_app}" | '
                 f'Fecha: {fecha_sesion} | Inicio: {inicio_sesion} | Fin: {fin_sesion} '
                 f'| Duración (s): {int(duracion)}s | Navegador: {es_navegador}  | Categoría: {categoria}')
         else:

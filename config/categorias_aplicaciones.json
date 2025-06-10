@@ -73,9 +73,11 @@
         "adobe xd.exe",
         "dia.exe",
         "mspaint.exe",
-        "pencil.exe"
+        "pencil.exe",
+        "photos.exe"
     ],
     "Desarrollo": [
+        "python.exe",
         "code.exe",
         "pycharm.exe",
         "sublime_text.exe",
@@ -100,7 +102,8 @@
         "cmd.exe",
         "datagrip64.exe",
         "db browser for sqlite.exe",
-        "virtualboxvm.exe"	
+        "virtualboxvm.exe", 
+        "registroactividad.exe"
     ],
     "Juegos": [
         "steam.exe",

@@ -18,11 +18,11 @@ def navegador_activo(nombre_proceso: str) -> bool:
     return False
 
 def monitorear_sesiones_navegador(stop_event: Event):
-    logger.info("🧭 Monitoreando sesiones completas del navegador...")
+    logger.info("Monitoreando sesiones completas del navegador...")
 
     procesos_previos = {nav: False for nav in NAVEGADORES}
     tiempos_inicio = {}
-    logger.info("🔄 Verificando estado de los navegadores...")
+    logger.info("Verificando estado de los navegadores...")
 
     while not stop_event.is_set():
         try:
@@ -54,5 +54,5 @@ def monitorear_sesiones_navegador(stop_event: Event):
 
             stop_event.wait(2)
         except Exception as e:
-            logger.exception(f"❌ Error en el monitoreo de navegadores: {e}")
+            logger.exception(f"Error en el monitoreo de navegadores: {e}")
             break

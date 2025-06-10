@@ -28,7 +28,6 @@ def get_categories(db: Session = Depends(get_db)):
         select(Categoria)
         .order_by(Categoria.descripcionCategoria)
     )
-    result = db.execute(stmt).all()
     return db.execute(stmt).scalars().all()
 
 # Consulta para sacar top 10 de apps por su tiempo de uso
@@ -68,38 +67,41 @@ def get_top_appcats(db: Session = Depends(get_db)):
 @app.get('/filtros_app', response_model=List[AppFiltro])
 def get_filtered_apps(
     categoria_id: Optional[int] = Query(None),
-    fecha_inicio: str = Query(...),
-    fecha_fin: str = Query(...),
     db: Session = Depends(get_db)
 ):
     try:
-        condiciones = [
-            SesionApp.fechaSesion.between(fecha_inicio, fecha_fin)
-        ]
-        
+        condiciones = []
+
         if categoria_id is not None:
             condiciones.append(Aplicacion.idCategoriaAppFK == categoria_id)
 
         stmt = (
             select(
+                Aplicacion.idAplicacion.label("id_app"),
                 Aplicacion.nombreAplicacion.label("aplicacion"),
                 func.sum(SesionApp.duracionSesion).label("tiempo_empleado")
             )
             .join(SesionApp, Aplicacion.idAplicacion == SesionApp.idAplicacionFK)
-            .where(and_(*condiciones))
+            .where(and_(*condiciones) if condiciones else True)  # si no hay condiciones, no filtra
             .group_by(Aplicacion.nombreAplicacion)
             .order_by(func.sum(SesionApp.duracionSesion).desc())
+            .limit(10)
         )
 
         result = db.execute(stmt).all()
 
         return [
-            {"aplicacion": row._mapping["aplicacion"], "tiempo_empleado": row._mapping["tiempo_empleado"]}
+            {
+                "id_app": row._mapping["id_app"],
+                "aplicacion": row._mapping["aplicacion"],
+                "tiempo_empleado": row._mapping["tiempo_empleado"]
+            }
             for row in result
         ]
     except Exception as e:
-        traceback.print_exc() 
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
     
 # Consulta para sacar top 10 de sitios web por su número de visitas
 @app.get('/sitios_web', response_model = List[Web])
@@ -139,36 +141,50 @@ def get_top_webcats(db: Session = Depends(get_db)):
 @app.get('/filtros_web', response_model=List[WebFiltro])
 def get_filtered_websites(
     categoria_id: Optional[int] = Query(None),
-    fecha_inicio: str = Query(...),
-    fecha_fin: str = Query(...),
     db: Session = Depends(get_db)
 ):
     try:
-        condiciones = [
-            SesionWeb.fechaSesion.between(fecha_inicio, fecha_fin)
-        ]
+        condiciones = []
         
         if categoria_id is not None:
             condiciones.append(Sitio.idCategoriaWebFK == categoria_id)
 
         stmt = (
             select(
+                Sitio.idSitioWeb.label("id_sitio_web"),
                 Sitio.urlSitioWeb.label("sitio_web"),
                 Sitio.tituloSitioWeb.label("titulo_sitio_web"),
-                func.sum(SesionWeb.numeroVisitas).label("numero_visitas")
+                func.sum(SesionWeb.numeroVisitas).label("numero_visitas"),
+                Categoria.descripcionCategoria.label("categoria"),
+                Sitio.idCategoriaWebFK.label("id_cat")
             )
             .join(SesionWeb, Sitio.idSitioWeb == SesionWeb.idSitioWebFK)
-            .where(and_(*condiciones))
-            .group_by(Sitio.urlSitioWeb)
+            .join(Categoria, Sitio.idCategoriaWebFK == Categoria.idCategoria)
+            .where(and_(*condiciones) if condiciones else True)
+            .group_by(
+                Sitio.idSitioWeb,
+                Sitio.urlSitioWeb,
+                Sitio.tituloSitioWeb,
+                Categoria.descripcionCategoria,
+                Sitio.idCategoriaWebFK
+            )
             .order_by(func.sum(SesionWeb.numeroVisitas).desc())
+            .limit(10)
         )
 
         result = db.execute(stmt).all()
 
         return [
-            {"sitio_web": row._mapping["sitio_web"], "titulo_sitio_web": row._mapping["titulo_sitio_web"], "numero_visitas": row._mapping["numero_visitas"]}
+            {
+                "id_sitioweb": row._mapping["id_sitio_web"],
+                "sitio_web": row._mapping["sitio_web"],
+                "titulo_sitio_web": row._mapping["titulo_sitio_web"],
+                "numero_visitas": row._mapping["numero_visitas"],
+                "categoria": row._mapping["categoria"],
+                "id_cat": row._mapping["id_cat"]
+            }
             for row in result
         ]
     except Exception as e:
-        traceback.print_exc() 
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

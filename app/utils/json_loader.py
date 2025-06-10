@@ -22,9 +22,9 @@ def cargar_json(nombre_archivo):
         with open(ruta, 'r', encoding='utf-8') as file:
             return json.load(file)
     except FileNotFoundError:
-        logger.exception(f"❌ No se encontró el archivo {nombre_archivo} en: {ruta}")
+        logger.exception(f"No se encontró el archivo {nombre_archivo} en: {ruta}")
     except json.JSONDecodeError:
-        logger.exception(f"⚠️ Error al decodificar el archivo {nombre_archivo}. Revisa el formato.")
+        logger.exception(f"Error al decodificar el archivo {nombre_archivo}. Revisa el formato.")
     return {}
 
 def cargar_categorias_apps():
