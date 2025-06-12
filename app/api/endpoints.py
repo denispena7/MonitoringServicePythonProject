@@ -47,6 +47,7 @@ def get_top_apps(db: Session = Depends(get_db)):
 def get_top_appcats(db: Session = Depends(get_db)):
     stmt = (
         select(
+            Categoria.idCategoria.label("id"),
             Categoria.descripcionCategoria.label("categoria"),
             func.sum(SesionApp.duracionSesion).label("tiempo_empleado")
         )
@@ -59,7 +60,7 @@ def get_top_appcats(db: Session = Depends(get_db)):
 
     result = db.execute(stmt).all()
     return [
-        {"categoria": row._mapping["categoria"], "tiempo_empleado": row._mapping["tiempo_empleado"]}
+        {"id": row._mapping["id"], "categoria": row._mapping["categoria"], "tiempo_empleado": row._mapping["tiempo_empleado"]}
         for row in result
     ]
 
@@ -121,6 +122,7 @@ def get_top_webs(db: Session = Depends(get_db)):
 def get_top_webcats(db: Session = Depends(get_db)):
     stmt = (
         select(
+            Categoria.idCategoria.label("id"),
             Categoria.descripcionCategoria.label("categoria"),
             func.sum(SesionWeb.numeroVisitas).label("numero_visitas")
         )
@@ -133,7 +135,7 @@ def get_top_webcats(db: Session = Depends(get_db)):
 
     result = db.execute(stmt).all()
     return [
-        {"categoria": row._mapping["categoria"], "numero_visitas": row._mapping["numero_visitas"]}
+        {"id": row._mapping["id"], "categoria": row._mapping["categoria"], "numero_visitas": row._mapping["numero_visitas"]}
         for row in result
     ]
 
